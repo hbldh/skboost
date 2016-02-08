@@ -1,10 +1,12 @@
 # skboost
 
+[![Build Status](https://travis-ci.org/hbldh/skboost.svg)](https://travis-ci.org/hbldh/skboost)
+
 Boosting Algorithms compatible with [scikit-learn](http://scikit-learn.org/).
 
 ## Boosting Algorithms
 
-The skboost package contains implementations of some boosting algorithms that
+The `skboost` package contains implementations of some boosting algorithms that
 are outside the scope of [scikit-learn](http://scikit-learn.org/).
 
 The main point of interest is the MILBoost algorithm, which performs boosting
