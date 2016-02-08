@@ -1,0 +1,5 @@
+numpy>=1.10.2
+scipy>=0.16.1
+scikit-learn>=0.17
+six>=1.10.0
+futures>=3.0.3
