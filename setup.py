@@ -59,9 +59,9 @@ setup(
     ext_package='skboost.stumps.ext',
     ext_modules=[
         Extension('classifiers',
-                  sources=['skboost/stumps/ext/classifiers_src/classifiers.c'],
+                  sources=['skboost/stumps/ext/src/classifiers.c'],
                   include_dirs=[numpy.get_include(),
-                                'skboost/stumps/ext/classifiers_src/'])
+                                'skboost/stumps/ext/src/'])
     ],
     entry_points={}
 )

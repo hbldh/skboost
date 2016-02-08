@@ -27,7 +27,7 @@ See \[3\].
 ## Datasets
 
 This repository includes a vendored copy of the MUSK datasets (\[5\]), both version 1 and version 2.
-These are often used for multiple instance learning benchmarks:
+These are used for multiple instance learning benchmarks:
 
 > This dataset describes a set of 92 molecules of which 47 are judged by human experts 
 > to be musks and the remaining 45 molecules are judged to be non-musks. The goal is 
@@ -63,16 +63,16 @@ The annals of statistics, 28, 337-407.](https://web.stanford.edu/~hastie/Papers/
 \[4\] [Paul Viola, John C. Platt, and Cha Zhang. Multiple instance boosting
 for object detection. In In NIPS 18, pages 1419–1426. MIT Press, 2006.](http://vision.ucsd.edu/~bbabenko/data/miltrack-pami-final.pdf)
 
-\[5\] [Lichman, M. (2013). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml](http://archive.ics.uci.edu/ml). 
-Irvine, CA: University of California, School of Information and Computer Science.]
+\[5\] Lichman, M. (2013). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml](http://archive.ics.uci.edu/ml). 
+Irvine, CA: University of California, School of Information and Computer Science.
 
 ### Other references
 
 \[6\] C.M. Bishop. Pattern recognition and machine learning. Information
 science and statistics. Springer, 2006.
 
-\[7\] Stephen Boyd and Lieven Vandenberghe. Convex Optimization. Cam-
-bridge University Press, March 2004.
+\[7\] Stephen Boyd and Lieven Vandenberghe. Convex Optimization. 
+Cambridge University Press, March 2004.
 
 \[8\] Thomas G. Dietterich and Richard H. Lathrop. Solving the multiple-
 instance problem with axis-parallel rectangles. Artificial Intelligence,
@@ -87,8 +87,8 @@ Statistics and Data Analysis, 38:367–378, 1999.
 \[11\] Jerome H. Friedman. Greedy function approximation: A gradient
 boosting machine. Annals of Statistics, 29:1189–1232, 2000.
 
-\[12\] James D. Keeler, David E. Rumelhart, and Wee Kheng Leow. In-
-tegrated segmentation and recognition of hand-printed numerals. In
+\[12\] James D. Keeler, David E. Rumelhart, and Wee Kheng Leow. Integrated 
+segmentation and recognition of hand-printed numerals. In
 NIPS’90, pages 557–563, 1990.
 
 \[13\] Llew Mason, Jonathan Baxter, Peter Bartlett, and Marcus Frean.
@@ -102,7 +102,7 @@ entific Computing. Cambridge University Press, New York, NY, USA,
 \[15\] Vladimir N. Vapnik. The nature of statistical learning theory. Springer-
 Verlag New York, Inc., New York, NY, USA, 1995.
 
-\[16\] Paul Viola and Michael Jones. Robust real-time object detection. In-
-ternational Journal of Computer Vision, 57(2):137–154, 2002.
+\[16\] Paul Viola and Michael Jones. Robust real-time object detection. 
+International Journal of Computer Vision, 57(2):137–154, 2002.
 
 

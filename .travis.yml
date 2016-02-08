@@ -28,6 +28,7 @@ addons:
     - gfortran
     - build-essential
 install:
+  - "pip install -U pip setuptools wheel"
   - "pip install coverage"
   - "travis_wait pip install numpy scipy"
   - "pip install -r requirements.txt"
