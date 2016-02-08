@@ -20,10 +20,11 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 from warnings import warn
-import psutil
 from operator import itemgetter
 import concurrent.futures as cfut
 
+import psutil
+import six
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClassifierMixin
@@ -123,7 +124,7 @@ class RegressionStump(DecisionTreeRegressor):
             self.classes_ = []
             self.n_classes_ = []
 
-            for k in xrange(self.n_outputs_):
+            for k in six.moves.range(self.n_outputs_):
                 classes_k, y[:, k] = unique(y[:, k], return_inverse=True)
                 self.classes_.append(classes_k)
                 self.n_classes_.append(classes_k.shape[0])
@@ -258,7 +259,7 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
 
     # Iterate over all feature dimensions and train the optimal
     # regression stump for each dimension.
-    for dim in xrange(n_dims):
+    for dim in six.moves.range(n_dims):
         if argsorted_X is not None:
             data_order = argsorted_X[:, dim]
         else:
@@ -353,11 +354,11 @@ def _fit_regressor_stump_threaded(X, y, sample_weight, argsorted_X=None):
     with cfut.ThreadPoolExecutor(max_workers=psutil.cpu_count()) as tpe:
         futures = []
         if argsorted_X is not None:
-            for dim in xrange(X.shape[1]):
+            for dim in six.moves.range(X.shape[1]):
                 futures.append(
                     tpe.submit(_regressor_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim]))
         else:
-            for dim in xrange(X.shape[1]):
+            for dim in six.moves.range(X.shape[1]):
                 futures.append(tpe.submit(_regressor_learn_one_dimension, dim, X[:, dim], Y, sample_weight))
         for future in cfut.as_completed(futures):
             classifier_result.append(future.result())
@@ -433,11 +434,11 @@ def _fit_regressor_stump_c_ext_threaded(X, y, sample_weight, argsorted_X=None):
     with cfut.ThreadPoolExecutor(max_workers=psutil.cpu_count()) as tpe:
         futures = []
         if argsorted_X is not None:
-            for dim in xrange(X.shape[1]):
+            for dim in six.moves.range(X.shape[1]):
                 futures.append(
                     tpe.submit(_regressor_c_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim]))
         else:
-            for dim in xrange(X.shape[1]):
+            for dim in six.moves.range(X.shape[1]):
                 futures.append(tpe.submit(_regressor_c_learn_one_dimension, dim, X[:, dim], Y, sample_weight))
         for future in cfut.as_completed(futures):
             classifier_result.append(future.result())

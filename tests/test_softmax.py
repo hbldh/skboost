@@ -37,24 +37,24 @@ class TestLSE(object):
 
     def test_lse_1(self):
         lse = LogSumExponential(5.0)
-        lse_vals = map(lambda x: lse.f(x), self.t)
+        lse_vals = [lse.f(x) for x in self.t]
         assert_array_less(lse_vals, self.true_t)
 
     def test_lse_2(self):
         lse = LogSumExponential(20.0)
-        lse_vals = map(lse.f, self.t)
+        lse_vals = [lse.f(x) for x in self.t]
         assert_array_less(lse_vals, self.true_t)
 
     def test_lse_3(self):
         lse = LogSumExponential()
         assert lse.radius == 1.0
-        lse_vals = map(lse.f, self.t)
+        lse_vals = [lse.f(x) for x in self.t]
         assert_array_less(lse_vals, self.true_t)
 
     def test_lse_4(self):
-        lse_vals_1 = np.array(map(LogSumExponential(1.0).f, self.t))
-        lse_vals_5 = np.array(map(LogSumExponential(5.0).f, self.t))
-        lse_vals_20 = np.array(map(LogSumExponential(20.0).f, self.t))
+        lse_vals_1 = np.array([LogSumExponential(1.0).f(x) for x in self.t])
+        lse_vals_5 = np.array([LogSumExponential(5.0).f(x) for x in self.t])
+        lse_vals_20 = np.array([LogSumExponential(20.0).f(x) for x in self.t])
         assert_array_less(lse_vals_1, lse_vals_5)
         assert_array_less(lse_vals_5, lse_vals_20)
 
@@ -68,7 +68,7 @@ class TestNOR(object):
 
     def test_nor_1(self):
         nor = NoisyOR()
-        nor_vals = map(nor.f, self.t)
+        nor_vals = [nor.f(x) for x in self.t]
         assert np.all((self.true_t - nor_vals) <= 0.0)
 
 
@@ -81,7 +81,7 @@ class TestISR(object):
 
     def test_isr_1(self):
         isr = ISR()
-        isr_vals = map(isr.f, self.t)
+        isr_vals = [isr.f(x) for x in self.t]
         assert np.all((self.true_t[1:-1] - isr_vals[1:-1]) <= 0.0)
 
 
@@ -94,23 +94,23 @@ class TestGM(object):
 
     def test_gm_1(self):
         gm = GeneralizedMean(5.0)
-        gm_vals = map(lambda x: gm.f(x), self.t)
+        gm_vals = [gm.f(x) for x in self.t]
         assert_array_less(gm_vals, self.true_t)
 
     def test_gm_2(self):
         gm = GeneralizedMean(20.0)
-        gm_vals = map(gm.f, self.t)
+        gm_vals = [gm.f(x) for x in self.t]
         assert_array_less(gm_vals, self.true_t)
 
     def test_gm_3(self):
         gm = GeneralizedMean()
         assert gm.radius == 1.0
-        gm_vals = map(gm.f, self.t)
+        gm_vals = [gm.f(x) for x in self.t]
         assert_array_less(gm_vals, self.true_t)
 
     def test_gm_4(self):
-        gm_vals_1 = np.array(map(GeneralizedMean(1.0).f, self.t))
-        gm_vals_5 = np.array(map(GeneralizedMean(5.0).f, self.t))
-        gm_vals_20 = np.array(map(GeneralizedMean(20.0).f, self.t))
+        gm_vals_1 = np.array([GeneralizedMean(1.0).f(x) for x in self.t])
+        gm_vals_5 = np.array([GeneralizedMean(5.0).f(x) for x in self.t])
+        gm_vals_20 = np.array([GeneralizedMean(20.0).f(x) for x in self.t])
         assert_array_less(gm_vals_1, gm_vals_5)
         assert_array_less(gm_vals_5, gm_vals_20)

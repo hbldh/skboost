@@ -20,12 +20,13 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 from warnings import warn
-import psutil
 from operator import itemgetter
 import concurrent.futures as cfut
 
+import psutil
 import numpy as np
 from scipy.sparse import issparse
+import six
 
 from sklearn.base import ClassifierMixin
 from sklearn.utils import check_random_state, check_array
@@ -158,7 +159,7 @@ class DecisionStump(DecisionTreeClassifier):
             self.classes_ = []
             self.n_classes_ = []
 
-            for k in xrange(self.n_outputs_):
+            for k in six.moves.range(self.n_outputs_):
                 classes_k, y[:, k] = unique(y[:, k], return_inverse=True)
                 self.classes_.append(classes_k)
                 self.n_classes_.append(classes_k.shape[0])
@@ -292,7 +293,7 @@ class DecisionStump(DecisionTreeClassifier):
         else:
             all_proba = []
 
-            for k in xrange(self.n_outputs_):
+            for k in six.moves.range(self.n_outputs_):
                 proba_k = proba[:, k, :self.n_classes_[k]]
                 normalizer = proba_k.sum(axis=1)[:, np.newaxis]
                 normalizer[normalizer == 0.0] = 1.0
@@ -322,7 +323,7 @@ def _fit_binary_decision_stump_breakpoint(X, y, sample_weight,
 
     classifier_result = []
 
-    for dim in xrange(X.shape[1]):
+    for dim in six.moves.range(X.shape[1]):
         if argsorted_X is not None:
             sorted_x = X[argsorted_X[:, dim], dim]
             w = sample_weight[argsorted_X[:, dim]]
@@ -403,11 +404,11 @@ def _fit_binary_decision_stump_breakpoint_threaded(X, y, sample_weight,
     tpe = cfut.ThreadPoolExecutor(max_workers=psutil.cpu_count())
     futures = []
     if argsorted_X is not None:
-        for dim in xrange(X.shape[1]):
+        for dim in six.moves.range(X.shape[1]):
             futures.append(
                 tpe.submit(_breakpoint_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim]))
     else:
-        for dim in xrange(X.shape[1]):
+        for dim in six.moves.range(X.shape[1]):
             futures.append(tpe.submit(_breakpoint_learn_one_dimension, dim, X[:, dim], Y, sample_weight))
     for future in cfut.as_completed(futures):
         classifier_result.append(future.result())

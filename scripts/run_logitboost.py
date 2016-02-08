@@ -58,14 +58,12 @@ for i, y_pred in enumerate(classifier.staged_predict(ds_test.data)):
 # Calculate step-by-step results per bag on training data.
 milboost_bag_train_error = np.zeros((len(classifier.estimators_),))
 for i, y_pred in enumerate(classifier.staged_predict(ds_train.data)):
-    bag_labels_pred = np.array(map(lambda x: np.max(x),
-                                   np.split(y_pred, ds_train.bag_partitioning)), 'int')
+    bag_labels_pred = np.array([np.max(x) for x in np.split(y_pred, ds_train.bag_partitioning)], 'int')
     milboost_bag_train_error[i] = zero_one_loss(bag_labels_pred, ds_train.bag_labels)
 
 milboost_bag_test_error = np.zeros((len(classifier.estimators_),))
 for i, y_pred in enumerate(classifier.staged_predict(ds_test.data)):
-    bag_labels_pred = np.array(map(lambda x: np.max(x),
-                                   np.split(y_pred, ds_test.bag_partitioning)), 'int')
+    bag_labels_pred = np.array([np.max(x) for x in np.split(y_pred, ds_test.bag_partitioning)], 'int')
     milboost_bag_test_error[i] = zero_one_loss(bag_labels_pred, np.sign(ds_test.bag_labels))
 
 

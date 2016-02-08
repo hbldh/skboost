@@ -12,6 +12,9 @@ python:
 matrix:
   allow_failures:
     - python: 2.6
+    - python: 3.3
+    - python: 3.4
+    - python: 3.5
     - python: "3.5-dev"
     - python: "nightly"
     - python: pypy

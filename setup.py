@@ -53,7 +53,8 @@ setup(
         'scipy>=0.9',
         'scikit-learn>=0.16.0',
         'six>=1.10.0',
-        'futures>=3.0.3'
+        'futures>=3.0.3',
+        'psutil>=3.4.2'
     ],
     dependency_links=[],
     ext_package='skboost.stumps.ext',

@@ -161,11 +161,10 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
                 return self._negative_log_likelihood(p_i)
 
             # TODO: Add option to choose optimization method.
-            alpha, fval, err, n_func = fminbound(optimization_function, 0.0, 5.0, full_output=True, disp=0)
-            #alpha, fval, n_it, n_feval, status = fmin(optimization_function, 0.0, full_output=True, disp=0)
+
+            alpha, fval, err, n_func = fminbound(optimization_function, 0.0, 5.0, full_output=True, disp=1)
             if self.learning_rate < 1.0:
                 alpha *= self.learning_rate
-        #return alpha[0], fval
         return alpha, fval
 
     def _estimate_instance_probabilities(self, dv):
@@ -173,7 +172,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
 
     def _estimate_bag_probabilites(self, instance_probabilites):
         bags = self._bag_split(instance_probabilites)
-        bag_probabilities = np.array(map(lambda x: self.softmax_fcn.f(x), bags))
+        bag_probabilities = np.array([self.softmax_fcn.f(x) for x in bags])
         return bag_probabilities
 
     def _calculate_new_weights(self, instance_probabilites, bag_probabilities):

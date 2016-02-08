@@ -91,6 +91,6 @@ def _parse_musk_data(data):
             bag_id += 1
         labels.append(int(bag_id * ((float(items[-1]) * 2) - 1)))
         conformation_names.append(items[1])
-        f.append(map(float, items[2:-1]))
+        f.append(list(map(float, items[2:-1])))
 
     return np.array(f), np.array(labels), (molecule_names, conformation_names)
