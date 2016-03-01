@@ -18,6 +18,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+from codecs import open
 from setuptools import setup, find_packages, Extension
 
 import numpy
@@ -25,8 +26,10 @@ import skboost
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
+
+def read(f):
+    return open(f, encoding='utf-8').read()
+
 
 setup(
     name='skboost',
@@ -38,7 +41,7 @@ setup(
     url=skboost.url,
     download_url=skboost.download_url,
     description=skboost.description,
-    long_description=LONG_DESCRIPTION,
+    long_description=read('README.md'),
     license=skboost.license,
     platforms=skboost.platforms,
     keywords=skboost.keywords,

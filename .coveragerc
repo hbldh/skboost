@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = skboost
+include = */skboost/*
+omit =
+    */setup.py
+    */scripts/*
