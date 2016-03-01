@@ -29,6 +29,7 @@ from skboost.milboost.softmax import ISR
 from skboost.milboost.softmax import GeneralizedMean
 from skboost.milboost.softmax import NoisyOR
 
+
 @pytest.fixture(scope='module')
 def t():
     t = np.linspace(0.0, 1.0, num=100)

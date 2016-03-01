@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import numpy as np
-from numpy.testing import *
+from numpy.testing import assert_array_less
 
 from skboost.datasets import MUSK1, Hastie_10_2
 from skboost.gentleboost import GentleBoostClassifier
