@@ -78,7 +78,7 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         return super(GentleBoostClassifier, self).fit(X, y, sample_weight)
 
-    def _boost(self, iboost, X, y, sample_weight):
+    def _boost(self, iboost, X, y, sample_weight, random_state):
         """Implement a single boost.
 
         Perform a single boost according to the real multi-class SAMME.R
@@ -98,6 +98,9 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         sample_weight : array-like of shape = [n_samples]
             The current sample weights.
+
+        random_state : numpy.RandomState
+            The current random number generator
 
         Returns
         -------

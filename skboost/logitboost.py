@@ -87,7 +87,7 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         return out
 
-    def _boost(self, iboost, X, y, sample_weight):
+    def _boost(self, iboost, X, y, sample_weight, random_state):
         """Implement a single boost iteration.
 
         Parameters
@@ -103,6 +103,9 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         sample_weight : array-like of shape = [n_samples]
             The current sample weights.
+
+        random_state : numpy.RandomState
+            The current random number generator
 
         Returns
         -------

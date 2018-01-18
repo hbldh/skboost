@@ -101,7 +101,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
 
         return out
 
-    def _boost(self, iboost, X, y, sample_weight):
+    def _boost(self, iboost, X, y, sample_weight, random_state):
 
         if iboost > 0:
             dv_pre = self.decision_function(X)

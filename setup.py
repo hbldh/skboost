@@ -17,12 +17,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import re
 import os
 from codecs import open
 from setuptools import setup, find_packages, Extension
 
 import numpy
-import skboost
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
@@ -31,33 +31,48 @@ def read(f):
     return open(f, encoding='utf-8').read()
 
 
+with open('skboost/version.py', 'r') as fd:
+    version = re.search(
+        '^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+        fd.read(), re.MULTILINE).group(1)
+
 setup(
     name='skboost',
-    version=skboost.__version__,
-    author=skboost.author,
-    author_email=skboost.author_email,
-    maintainer=skboost.maintainer,
-    maintainer_email=skboost.maintainer_email,
-    url=skboost.url,
-    download_url=skboost.download_url,
-    description=skboost.description,
+    version=version,
+    author='Henrik Blidh',
+    author_email='henrik.blidh@nedomkull.com',
+    url='https://github.com/hbldh/skboost',
+    description="Boosting Algorithms compatible with scikit-learn",
     long_description=read('README.md'),
-    license=skboost.license,
-    platforms=skboost.platforms,
-    keywords=skboost.keywords,
-    classifiers=skboost.classifiers,
+    license='MIT',
+    keywords=['Machine Learning', 'Boosting'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Developers',
+        'License :: MIT',
+        'Topic :: Software Development',
+        'Topic :: Scientific/Engineering',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
     packages=find_packages(exclude=['tests', 'scripts']),
     package_data={
         'skboost.stumps.ext': ['src/*', ],
         'skboost.datasets.musk': ['clean*.*', ],
     },
     install_requires=[
-        'numpy>=1.6.1',
-        'scipy>=0.9',
-        'scikit-learn>=0.16.0',
-        'six>=1.10.0',
-        'futures>=3.0.3',
-        'psutil>=3.4.2'
+        'numpy',
+        'scipy',
+        'scikit-learn',
+        'six',
+        'psutil',
+        'futures;python_version<"3.4"',
     ],
     dependency_links=[],
     ext_package='skboost.stumps.ext',
