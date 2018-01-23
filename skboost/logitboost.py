@@ -142,7 +142,7 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
         # by zero NaNs in the z array. This part sets these to the minimal value they can
         # be set to during the fitting to represent that we are very sure of these.
         # The warnings catcher suppresses the printout of these warnings.
-        z_nans = np.isnan(z)
+        z_nans = np.isnan(z) | np.isinf(z)
         z[z_nans] = self._01_labels[z_nans]
 
         fitted_estimator = estimator.fit(X, z, sample_weight=sample_weight)
