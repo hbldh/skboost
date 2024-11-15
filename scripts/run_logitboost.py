@@ -14,10 +14,7 @@ Created on 2015-11-06, 14:24
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +35,7 @@ ds_test = Hastie_10_2(random_state=43143)
 
 
 classifier = LogitBoostClassifier(
-    base_estimator=DecisionTreeRegressor(max_depth=3),
+    estimator=DecisionTreeRegressor(max_depth=3),
     n_estimators=30,
     learning_rate=1.0)
 classifier.fit(ds_train.data, np.sign(ds_train.labels))

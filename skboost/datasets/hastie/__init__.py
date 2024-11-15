@@ -14,16 +14,13 @@ Created on 2015-11-10
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
-import six
 import numpy as np
 from sklearn.datasets import make_hastie_10_2
 
-__all__ = ['Hastie_10_2', ]
+__all__ = [
+    "Hastie_10_2",
+]
 
 
 class Hastie_10_2(object):
@@ -43,9 +40,9 @@ class Hastie_10_2(object):
         self.data = self.data[i, :]
 
         self.bag_labels = []
-        for i, k in enumerate(six.moves.range(0, len(self.labels), n)):
-            self.labels[k:k+n] *= i + 1
-            self.bag_labels.append(np.sign(np.max(self.labels[k:k+n])))
-        self.labels = np.array(self.labels, 'int')
-        self.bag_labels = np.array(self.bag_labels, 'int')
+        for i, k in enumerate(range(0, len(self.labels), n)):
+            self.labels[k : k + n] *= i + 1
+            self.bag_labels.append(np.sign(np.max(self.labels[k : k + n])))
+        self.labels = np.array(self.labels, "int")
+        self.bag_labels = np.array(self.bag_labels, "int")
         self.bag_partitioning = np.cumsum(np.bincount(np.abs(self.labels))[1:])[:-1]

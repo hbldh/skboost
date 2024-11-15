@@ -14,11 +14,6 @@ Created on 2015-11-06, 14:24
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import zero_one_loss
@@ -38,7 +33,7 @@ ds_test = Hastie_10_2(random_state=54325)
 
 
 mil_classifier = MILBoostClassifier(
-    base_estimator=DecisionTreeClassifier(max_depth=1),
+    estimator=DecisionTreeClassifier(max_depth=1),
     #softmax=ISR(),
     #softmax=GeneralizedMean(5.0),
     #softmax=NoisyOR(),

@@ -8,4 +8,4 @@ from .lse import LogSumExponential
 from .nor import NoisyOR
 
 
-__all__ = ['GeneralizedMean', 'ISR', 'LogSumExponential', 'NoisyOR']
+__all__ = ["GeneralizedMean", "ISR", "LogSumExponential", "NoisyOR"]

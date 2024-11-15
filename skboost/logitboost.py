@@ -13,17 +13,12 @@
 Created on 2014-09-12, 22:57
 
 """
-
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 import numpy as np
+from sklearn.base import ClassifierMixin, RegressorMixin
+from sklearn.tree import DecisionTreeRegressor
 
 from sklearn.utils.validation import check_is_fitted
-from sklearn.ensemble.weight_boosting import DecisionTreeRegressor
-from sklearn.ensemble.weight_boosting import BaseWeightBoosting, ClassifierMixin, RegressorMixin
+from sklearn.ensemble._weight_boosting import BaseWeightBoosting
 
 
 class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
@@ -35,16 +30,12 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
     """
 
-    def __init__(self,
-                 base_estimator=DecisionTreeRegressor(max_depth=1),
-                 n_estimators=50,
-                 learning_rate=1.,
-                 random_state=None):
+    def __init__(
+        self, estimator=DecisionTreeRegressor(max_depth=1), n_estimators=50, learning_rate=1.0, random_state=None
+    ):
         super(LogitBoostClassifier, self).__init__(
-            base_estimator=base_estimator,
-            n_estimators=n_estimators,
-            learning_rate=learning_rate,
-            random_state=random_state)
+            estimator=estimator, n_estimators=n_estimators, learning_rate=learning_rate, random_state=random_state
+        )
 
         self._ensemble_classifier_response = None
         self._instance_probabilities = None
@@ -73,8 +64,8 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
             Returns self.
         """
         # Check that the base estimator is a classifier
-        if not isinstance(self.base_estimator, RegressorMixin):
-            raise TypeError("base_estimator must be a subclass of RegressorMixin")
+        if not isinstance(self.estimator, RegressorMixin):
+            raise TypeError("estimator must be a subclass of RegressorMixin")
 
         if len(np.unique(y)) != 2:
             raise ValueError("Only binary classification LogitBoost is implemented as of yet.")
@@ -129,12 +120,12 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
             pass
 
         if iboost == 0:
-            self._ensemble_classifier_response = np.zeros((len(y), ), dtype='float')
-            self._instance_probabilities = np.ones((len(y), ), dtype='float') / 2
+            self._ensemble_classifier_response = np.zeros((len(y),), dtype="float")
+            self._instance_probabilities = np.ones((len(y),), dtype="float") / 2
             self._01_labels = (y + 1) / 2
 
         # Update the weights
-        sample_weight = (self._instance_probabilities * (1 - self._instance_probabilities))
+        sample_weight = self._instance_probabilities * (1 - self._instance_probabilities)
         # Calculate the working response.
         z = (self._01_labels - self._instance_probabilities) / sample_weight
 
@@ -148,7 +139,7 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
         fitted_estimator = estimator.fit(X, z, sample_weight=sample_weight)
 
         if iboost == 0:
-            self.classes_ = getattr(estimator, 'classes_', None)
+            self.classes_ = getattr(estimator, "classes_", None)
             self.n_classes_ = 2
 
         y_predict = fitted_estimator.predict(X)
@@ -158,12 +149,11 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
         incorrect = np.sign(y_predict) != y
 
         # Error fraction
-        estimator_error = np.mean(
-            np.average(incorrect, weights=sample_weight, axis=0))
+        estimator_error = np.mean(np.average(incorrect, weights=sample_weight, axis=0))
 
         # Stop if classification is perfect
         if estimator_error <= 0:
-            return sample_weight, 1., 0.
+            return sample_weight, 1.0, 0.0
 
         # Only boost the weights if it will fit again
         if not iboost == self.n_estimators - 1:
@@ -172,7 +162,7 @@ class LogitBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         self.estimators_.append(fitted_estimator)
 
-        return sample_weight, 1., estimator_error
+        return sample_weight, 1.0, estimator_error
 
     def predict(self, X):
         """Predict classes for X.

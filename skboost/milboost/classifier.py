@@ -14,44 +14,42 @@ Created on 2015-11-06, 08:48
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
 import warnings
 
 import numpy as np
-from sklearn.ensemble.weight_boosting import ClassifierMixin, BaseWeightBoosting
+from sklearn.base import ClassifierMixin
+from sklearn.ensemble._weight_boosting import BaseWeightBoosting
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.validation import check_is_fitted
 from scipy.optimize import fminbound
 
 from skboost.milboost.softmax import SoftmaxFunction
 
-__all__ = ['MILBoostClassifier', ]
+__all__ = [
+    "MILBoostClassifier",
+]
 
 
 class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
-
-    def __init__(self,
-                 base_estimator=DecisionTreeClassifier(max_depth=10),
-                 softmax=None,
-                 n_estimators=50,
-                 learning_rate=1.0,
-                 random_state=None,
-                 verbose=False):
+    def __init__(
+        self,
+        estimator=DecisionTreeClassifier(max_depth=10),
+        softmax=None,
+        n_estimators=50,
+        learning_rate=1.0,
+        random_state=None,
+        verbose=False,
+    ):
 
         super(MILBoostClassifier, self).__init__(
-            base_estimator=base_estimator,
-            n_estimators=n_estimators,
-            learning_rate=learning_rate,
-            random_state=random_state)
+            estimator=estimator, n_estimators=n_estimators, learning_rate=learning_rate, random_state=random_state
+        )
 
         if not isinstance(softmax, SoftmaxFunction):
             raise TypeError("Softmax input must be an object of class `SoftmaxFunction`")
-        self.softmax_fcn = softmax
-        self._verbose = verbose
+        self.softmax = softmax
+        self.verbose = verbose
 
         self._bag_labels = None
         self._inferred_y = None
@@ -59,7 +57,8 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
 
     def __str__(self):
         return "{0}, with {1} {2} classifiers".format(
-            self.__class__.__name__, len(self.estimators_), self.estimators_[0])
+            self.__class__.__name__, len(self.estimators_), self.estimators_[0]
+        )
 
     def fit(self, X, y, sample_weight=None):
         """Build a boosted classifier from the training set (X, y).
@@ -85,7 +84,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
 
         # Pre-compute bag labels and inferred instance labels from y.
         unique_bag_ids = np.unique(y)
-        self._bag_labels = np.zeros((max(np.abs(unique_bag_ids)) + 1, ), 'int')
+        self._bag_labels = np.zeros((max(np.abs(unique_bag_ids)) + 1,), "int")
         self._bag_labels[np.abs(unique_bag_ids)] = np.sign(unique_bag_ids)
         self._bag_labels = self._bag_labels[1:]
         self._inferred_y = np.sign(y)
@@ -109,7 +108,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
             bag_probabilites = self._estimate_bag_probabilites(instance_probabilites)
             sample_weight = self._calculate_new_weights(instance_probabilites, bag_probabilites)
         else:
-            dv_pre = np.zeros(((X.shape[0]),), 'float')
+            dv_pre = np.zeros(((X.shape[0]),), "float")
 
         estimator = self._make_estimator()
         try:
@@ -125,16 +124,15 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
         incorrect = y_predict != self._inferred_y
 
         # Error fraction
-        estimator_error = np.mean(
-            np.average(incorrect, weights=_weights, axis=0))
+        estimator_error = np.mean(np.average(incorrect, weights=_weights, axis=0))
 
         if iboost == 0:
-            self.classes_ = getattr(estimator, 'classes_', None)
+            self.classes_ = getattr(estimator, "classes_", None)
             self.n_classes_ = len(self.classes_)
 
         # Estimate alpha, the estimator weight.
         estimator_weight, nll = self._find_estimator_weight(y, dv_pre, y_predict)
-        if self._verbose:
+        if self.verbose:
             print("[{0}] - err={1:.4f}, w={2:.4f}, -L={3:.4f}".format(iboost, estimator_error, estimator_weight, nll))
 
         if estimator_weight < 1e-5:
@@ -172,14 +170,12 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
 
     def _estimate_bag_probabilites(self, instance_probabilites):
         bags = self._bag_split(instance_probabilites)
-        bag_probabilities = np.array([self.softmax_fcn.f(x) for x in bags])
+        bag_probabilities = np.array([self.softmax.f(x) for x in bags])
         return bag_probabilities
 
     def _calculate_new_weights(self, instance_probabilites, bag_probabilities):
         weights = []
-        for p_ij, p_i, Y_i in zip(self._bag_split(instance_probabilites),
-                                  bag_probabilities,
-                                  self._bag_labels):
+        for p_ij, p_i, Y_i in zip(self._bag_split(instance_probabilites), bag_probabilities, self._bag_labels):
             if Y_i > 0:
                 if p_i == 0.0:
                     p_i = np.finfo(float).resolution
@@ -188,7 +184,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
                 if p_i == 1.0:
                     p_i = 1 - np.finfo(float).resolution
                 term_1 = -((2 * p_ij * (1 - p_ij)) / (1 - p_i))
-            weights += (term_1 * self.softmax_fcn.d_dt(p_ij)).tolist()
+            weights += (term_1 * self.softmax.d_dt(p_ij)).tolist()
 
         return np.array(weights) / np.sum(np.abs(weights))
 
@@ -215,12 +211,12 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
             class in ``classes_``, respectively.
         """
         check_is_fitted(self, "n_classes_")
-        X = self._validate_X_predict(X)
+        X = self._validate_data(X)
 
         classes = self.classes_[:, np.newaxis]
-        pred = sum((estimator.predict(X) == classes).T * w
-                   for estimator, w in zip(self.estimators_,
-                                           self.estimator_weights_))
+        pred = sum(
+            (estimator.predict(X) == classes).T * w for estimator, w in zip(self.estimators_, self.estimator_weights_)
+        )
         pred[:, 0] *= -1
         return pred.sum(axis=1)
 
@@ -247,13 +243,12 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
             class in ``classes_``, respectively.
         """
         check_is_fitted(self, "n_classes_")
-        X = self._validate_X_predict(X)
+        X = self._validate_data(X)
 
         classes = self.classes_[:, np.newaxis]
         pred = None
 
-        for weight, estimator in zip(self.estimator_weights_,
-                                     self.estimators_):
+        for weight, estimator in zip(self.estimator_weights_, self.estimators_):
 
             current_pred = estimator.predict(X)
             current_pred = (current_pred == classes).T * weight
@@ -335,14 +330,12 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
         check_is_fitted(self, "n_classes_")
 
         n_classes = self.n_classes_
-        X = self._validate_X_predict(X)
+        X = self._validate_data(X)
 
-        proba = sum(estimator.predict_proba(X) * w
-                    for estimator, w in zip(self.estimators_,
-                                            self.estimator_weights_))
+        proba = sum(estimator.predict_proba(X) * w for estimator, w in zip(self.estimators_, self.estimator_weights_))
 
         proba /= self.estimator_weights_.sum()
-        proba = np.exp((1. / (n_classes - 1)) * proba)
+        proba = np.exp((1.0 / (n_classes - 1)) * proba)
         normalizer = proba.sum(axis=1)[:, np.newaxis]
         normalizer[normalizer == 0.0] = 1.0
         proba /= normalizer
@@ -373,14 +366,13 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
             The class probabilities of the input samples. The order of
             outputs is the same of that of the `classes_` attribute.
         """
-        X = self._validate_X_predict(X)
+        X = self._validate_data(X)
 
         n_classes = self.n_classes_
         proba = None
-        norm = 0.
+        norm = 0.0
 
-        for weight, estimator in zip(self.estimator_weights_,
-                                     self.estimators_):
+        for weight, estimator in zip(self.estimator_weights_, self.estimators_):
             norm += weight
 
             current_proba = estimator.predict_proba(X) * weight
@@ -390,7 +382,7 @@ class MILBoostClassifier(ClassifierMixin, BaseWeightBoosting):
             else:
                 proba += current_proba
 
-            real_proba = np.exp((1. / (n_classes - 1)) * (proba / norm))
+            real_proba = np.exp((1.0 / (n_classes - 1)) * (proba / norm))
             normalizer = real_proba.sum(axis=1)[:, np.newaxis]
             normalizer[normalizer == 0.0] = 1.0
             real_proba /= normalizer

@@ -13,12 +13,6 @@
 Created on 2015-11-11
 
 """
-
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 import numpy as np
 from numpy.testing import assert_array_less
 
@@ -30,7 +24,7 @@ from sklearn.metrics import zero_one_loss
 
 def test_gentleboost_musk_fitting():
     c = GentleBoostClassifier(
-        base_estimator=DecisionTreeRegressor(max_depth=1),
+        estimator=DecisionTreeRegressor(max_depth=1),
         n_estimators=30,
         learning_rate=1.0
     )
@@ -42,7 +36,7 @@ def test_gentleboost_musk_fitting():
 
 def test_gentleboost_hastie_fitting():
     c = GentleBoostClassifier(
-        base_estimator=DecisionTreeRegressor(max_depth=1),
+        estimator=DecisionTreeRegressor(max_depth=1),
         n_estimators=30,
         learning_rate=1.0
     )

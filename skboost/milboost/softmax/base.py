@@ -14,11 +14,6 @@ Created on 2015-11-06
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 
 class SoftmaxFunction(object):
     """The Generalized Mean softmax function."""

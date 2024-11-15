@@ -13,37 +13,32 @@
 Created on 2015-11-06, 14:11
 
 """
-
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
-from pkg_resources import resource_filename
-
+from pathlib import Path
 import numpy as np
 
-__all__ = ['MUSK1', 'MUSK2']
+__all__ = ["MUSK1", "MUSK2"]
 
 
 class _MUSK(object):
     def __init__(self, id_):
         self.name = None
         data, self._names, self.info = _read_musk_data(id_)
-        self.data, self.labels, \
-            (self.molecule_names, self.conformation_names) = _parse_musk_data(data)
+        self.data, self.labels, (self.molecule_names, self.conformation_names) = _parse_musk_data(data)
 
         unique_bag_ids = np.unique(self.labels)
-        self.bag_labels = np.zeros((max(np.abs(unique_bag_ids)) + 1,), 'int')
+        self.bag_labels = np.zeros((max(np.abs(unique_bag_ids)) + 1,), "int")
         self.bag_labels[np.abs(unique_bag_ids)] = np.sign(unique_bag_ids)
         self.bag_labels = self.bag_labels[1:]
         self.bag_partitioning = np.cumsum(np.bincount(np.abs(self.labels))[1:])[:-1]
 
     def __str__(self):
         return "{0} - {1} instances with {2} features. {3} Musks, {4} Non-musks".format(
-            self.name, self.data.shape[0], self.data.shape[1],
+            self.name,
+            self.data.shape[0],
+            self.data.shape[1],
             len(np.unique(self.labels[self.labels > 0])),
-            len(np.unique(self.labels[self.labels < 0])))
+            len(np.unique(self.labels[self.labels < 0])),
+        )
 
     def __repr__(self):
         return str(self)
@@ -65,14 +60,13 @@ class MUSK2(_MUSK):
 
 
 def _read_musk_data(id_):
-    with open(resource_filename('skboost.datasets.musk',
-                                'clean{0}.data'.format(id_)), mode='r') as f:
+    _here = Path(__file__).parent
+
+    with open(_here / f"clean{id_}.data", mode="r") as f:
         data = f.readlines()
-    with open(resource_filename('skboost.datasets.musk',
-                                'clean{0}.names'.format(id_)), mode='r') as f:
+    with open(_here / f"clean{id_}.names", mode="r") as f:
         names = f.readlines()
-    with open(resource_filename('skboost.datasets.musk',
-                                'clean{0}.info'.format(id_)), mode='r') as f:
+    with open(_here / f"clean{id_}.info", mode="r") as f:
         info = f.read()
     return data, names, info
 
@@ -85,7 +79,7 @@ def _parse_musk_data(data):
 
     bag_id = 0
     for row in data:
-        items = row.strip('\n').split(',')
+        items = row.strip("\n").split(",")
         if items[0] not in molecule_names:
             molecule_names.append(items[0])
             bag_id += 1

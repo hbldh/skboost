@@ -14,11 +14,6 @@ Created on 2015-11-06, 14:24
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import zero_one_loss
@@ -37,7 +32,7 @@ print(ds_test)
 
 
 classifier = GentleBoostClassifier(
-    base_estimator=DecisionTreeRegressor(max_depth=1),
+    estimator=DecisionTreeRegressor(max_depth=1),
     n_estimators=20,
     learning_rate=1.0)
 classifier.fit(ds_train.data, np.sign(ds_train.labels))

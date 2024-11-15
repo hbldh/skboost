@@ -14,15 +14,13 @@ Created on 2014-08-30, 22:25
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
 import numpy as np
 
+from sklearn.base import ClassifierMixin, RegressorMixin
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.utils.validation import check_is_fitted
-from sklearn.ensemble.weight_boosting import BaseWeightBoosting, ClassifierMixin, RegressorMixin, DecisionTreeRegressor
+from sklearn.ensemble._weight_boosting import BaseWeightBoosting
 
 
 class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
@@ -34,16 +32,12 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
     """
 
-    def __init__(self,
-                 base_estimator=DecisionTreeRegressor(max_depth=1),
-                 n_estimators=100,
-                 learning_rate=1.,
-                 random_state=None):
+    def __init__(
+        self, estimator=DecisionTreeRegressor(max_depth=1), n_estimators=100, learning_rate=1.0, random_state=None
+    ):
         super(GentleBoostClassifier, self).__init__(
-            base_estimator=base_estimator,
-            n_estimators=n_estimators,
-            learning_rate=learning_rate,
-            random_state=random_state)
+            estimator=estimator, n_estimators=n_estimators, learning_rate=learning_rate, random_state=random_state
+        )
 
         self.threshold = 0.0
 
@@ -68,13 +62,15 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
             Returns self.
         """
         # Check that the base estimator is a classifier
-        if not isinstance(self.base_estimator, RegressorMixin):
-            raise TypeError("base_estimator must be a subclass of RegressorMixin")
+        if not isinstance(self.estimator, RegressorMixin):
+            raise TypeError("estimator must be a subclass of RegressorMixin")
 
         n_classes = len(np.unique(y))
         if n_classes != 2:
-            raise ValueError("The GentleBoost classifier is a binary classifier, "
-                             "and the labels array had {0} classes.".format(n_classes))
+            raise ValueError(
+                "The GentleBoost classifier is a binary classifier, "
+                "and the labels array had {0} classes.".format(n_classes)
+            )
 
         return super(GentleBoostClassifier, self).fit(X, y, sample_weight)
 
@@ -126,7 +122,7 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
         fitted_estimator = estimator.fit(X, y, sample_weight=sample_weight)
 
         if iboost == 0:
-            self.classes_ = getattr(estimator, 'classes_', None)
+            self.classes_ = getattr(estimator, "classes_", None)
             self.n_classes_ = 2
 
         y_predict = fitted_estimator.predict(X)
@@ -134,12 +130,11 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
         # Instances incorrectly classified
         incorrect = np.sign(y_predict) != y
         # Error fraction
-        estimator_error = np.mean(
-            np.average(incorrect, weights=sample_weight, axis=0))
+        estimator_error = np.mean(np.average(incorrect, weights=sample_weight, axis=0))
 
         # Stop if classification is perfect
         if estimator_error <= 0:
-            return sample_weight, 1., 0.
+            return sample_weight, 1.0, 0.0
 
         # Only boost the weights if it will fit again
         if not iboost == self.n_estimators - 1:
@@ -148,7 +143,7 @@ class GentleBoostClassifier(BaseWeightBoosting, ClassifierMixin):
 
         self.estimators_.append(fitted_estimator)
 
-        return sample_weight, 1., estimator_error
+        return sample_weight, 1.0, estimator_error
 
     def predict(self, X):
         """Predict classes for X.

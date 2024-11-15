@@ -14,11 +14,6 @@ Created on 2015-11-12
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
-
 import numpy as np
 from numpy.testing import assert_array_less
 
@@ -30,7 +25,7 @@ from sklearn.metrics import zero_one_loss
 
 def test_milboost_musk_fitting_lse():
     c = MILBoostClassifier(
-        base_estimator=DecisionTreeClassifier(max_depth=1),
+        estimator=DecisionTreeClassifier(max_depth=1),
         softmax=LogSumExponential(5.0),
         n_estimators=30,
         learning_rate=1.0
@@ -44,7 +39,7 @@ def test_milboost_musk_fitting_lse():
 
 def test_milboost_hastie_fitting():
     c = MILBoostClassifier(
-        base_estimator=DecisionTreeClassifier(max_depth=1),
+        estimator=DecisionTreeClassifier(max_depth=1),
         softmax=LogSumExponential(5.0),
         n_estimators=30,
         learning_rate=1.0

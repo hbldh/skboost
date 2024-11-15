@@ -14,22 +14,16 @@ Created on 2014-08-31, 01:52
 
 """
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
 from warnings import warn
 from operator import itemgetter
 import concurrent.futures as cfut
 
 import psutil
-import six
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.base import ClassifierMixin
 from sklearn.utils import check_random_state, check_array
-from numpy.lib.arraysetops import unique
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.tree import _tree
 
@@ -38,7 +32,9 @@ try:
 except ImportError as e:
     c_classifiers = None
 
-__all__ = ['RegressionStump',]
+__all__ = [
+    "RegressionStump",
+]
 
 # =============================================================================
 # Types and constants
@@ -49,52 +45,57 @@ DOUBLE = _tree.DOUBLE
 
 
 class RegressionStump(DecisionTreeRegressor):
-    def __init__(self,
-                 criterion="mse",
-                 splitter="best",
-                 max_depth=None,
-                 min_samples_split=2,
-                 min_samples_leaf=1,
-                 max_features=None,
-                 random_state=None,
-                 min_density=None,
-                 compute_importances=None,
-                 method='default',):
-        super(RegressionStump, self).__init__(criterion,
-                                                 splitter,
-                                                 max_depth,
-                                                 min_samples_split,
-                                                 min_samples_leaf,
-                                                 max_features,
-                                                 random_state)
+    def __init__(
+        self,
+        criterion="mse",
+        splitter="best",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        max_features=None,
+        random_state=None,
+        min_density=None,
+        compute_importances=None,
+        method="default",
+    ):
+        super(RegressionStump, self).__init__(
+            criterion, splitter, max_depth, min_samples_split, min_samples_leaf, max_features, random_state
+        )
         if min_density is not None:
-            warn("The min_density parameter is deprecated as of version 0.14 "
-                 "and will be removed in 0.16.", DeprecationWarning)
+            warn(
+                "The min_density parameter is deprecated as of version 0.14 " "and will be removed in 0.16.",
+                DeprecationWarning,
+            )
 
         if compute_importances is not None:
-            warn("Setting compute_importances is no longer required as "
-                 "version 0.14. Variable importances are now computed on the "
-                 "fly when accessing the feature_importances_ attribute. "
-                 "This parameter will be removed in 0.16.",
-                 DeprecationWarning)
+            warn(
+                "Setting compute_importances is no longer required as "
+                "version 0.14. Variable importances are now computed on the "
+                "fly when accessing the feature_importances_ attribute. "
+                "This parameter will be removed in 0.16.",
+                DeprecationWarning,
+            )
 
         # Fixed point parameters.
         self.f_above = None
         self.f_below = None
         self.method = method
 
-    def fit(self, X, y, sample_mask=None, X_argsorted=None, check_input=True,
-            sample_weight=None):
+    def fit(self, X, y, sample_mask=None, X_argsorted=None, check_input=True, sample_weight=None):
         random_state = check_random_state(self.random_state)
 
         # Deprecations
         if sample_mask is not None:
-            warn("The sample_mask parameter is deprecated as of version 0.14 "
-                 "and will be removed in 0.16.", DeprecationWarning)
+            warn(
+                "The sample_mask parameter is deprecated as of version 0.14 " "and will be removed in 0.16.",
+                DeprecationWarning,
+            )
 
         if X_argsorted is not None:
-            warn("The X_argsorted parameter is deprecated as of version 0.14 "
-                 "and will be removed in 0.16.", DeprecationWarning)
+            warn(
+                "The X_argsorted parameter is deprecated as of version 0.14 " "and will be removed in 0.16.",
+                DeprecationWarning,
+            )
 
         # Convert data
         if check_input:
@@ -102,8 +103,7 @@ class RegressionStump(DecisionTreeRegressor):
             if issparse(X):
                 X.sort_indices()
                 if X.indices.dtype != np.intc or X.indptr.dtype != np.intc:
-                    raise ValueError("No support for np.int64 index based "
-                                     "sparse matrices")
+                    raise ValueError("No support for np.int64 index based " "sparse matrices")
 
         # Determine output settings
         n_samples, self.n_features_ = X.shape
@@ -124,8 +124,8 @@ class RegressionStump(DecisionTreeRegressor):
             self.classes_ = []
             self.n_classes_ = []
 
-            for k in six.moves.range(self.n_outputs_):
-                classes_k, y[:, k] = unique(y[:, k], return_inverse=True)
+            for k in range(self.n_outputs_):
+                classes_k, y[:, k] = np.unique(y[:, k], return_inverse=True)
                 self.classes_.append(classes_k)
                 self.n_classes_.append(classes_k.shape[0])
 
@@ -141,8 +141,7 @@ class RegressionStump(DecisionTreeRegressor):
             y = np.ascontiguousarray(y, dtype=DOUBLE)
 
         if len(y) != n_samples:
-            raise ValueError("Number of labels=%d does not match "
-                             "number of samples=%d" % (len(y), n_samples))
+            raise ValueError("Number of labels=%d does not match " "number of samples=%d" % (len(y), n_samples))
         if self.min_samples_split <= 0:
             raise ValueError("min_samples_split must be greater than zero.")
         if self.min_samples_leaf <= 0:
@@ -153,26 +152,22 @@ class RegressionStump(DecisionTreeRegressor):
             raise ValueError("max_features must be in (0, n_features]")
 
         if sample_weight is not None:
-            if (getattr(sample_weight, "dtype", None) != DOUBLE or
-                    not sample_weight.flags.contiguous):
-                sample_weight = np.ascontiguousarray(
-                    sample_weight, dtype=DOUBLE)
+            if getattr(sample_weight, "dtype", None) != DOUBLE or not sample_weight.flags.contiguous:
+                sample_weight = np.ascontiguousarray(sample_weight, dtype=DOUBLE)
             if len(sample_weight.shape) > 1:
-                raise ValueError("Sample weights array has more "
-                                 "than one dimension: %d" %
-                                 len(sample_weight.shape))
+                raise ValueError("Sample weights array has more " "than one dimension: %d" % len(sample_weight.shape))
             if len(sample_weight) != n_samples:
-                raise ValueError("Number of weights=%d does not match "
-                                 "number of samples=%d" %
-                                 (len(sample_weight), n_samples))
+                raise ValueError(
+                    "Number of weights=%d does not match " "number of samples=%d" % (len(sample_weight), n_samples)
+                )
 
-        if self.method == 'default':
+        if self.method == "default":
             self.tree_ = _fit_regressor_stump(X, y, sample_weight, X_argsorted)
-        elif self.method == 'threaded':
+        elif self.method == "threaded":
             self.tree_ = _fit_regressor_stump_threaded(X, y, sample_weight, X_argsorted)
-        elif self.method == 'c':
+        elif self.method == "c":
             self.tree_ = _fit_regressor_stump_c_ext(X, y, sample_weight, X_argsorted)
-        elif self.method == 'c_threaded':
+        elif self.method == "c_threaded":
             self.tree_ = _fit_regressor_stump_c_ext_threaded(X, y, sample_weight, X_argsorted)
         else:
             self.tree_ = _fit_regressor_stump(X, y, sample_weight, X_argsorted)
@@ -201,10 +196,8 @@ class RegressionStump(DecisionTreeRegressor):
             The predicted classes, or the predict values.
         """
         X = check_array(X, dtype=DTYPE, accept_sparse="csr")
-        if issparse(X) and (X.indices.dtype != np.intc or
-                                    X.indptr.dtype != np.intc):
-            raise ValueError("No support for np.int64 index based "
-                             "sparse matrices")
+        if issparse(X) and (X.indices.dtype != np.intc or X.indptr.dtype != np.intc):
+            raise ValueError("No support for np.int64 index based " "sparse matrices")
 
         n_samples, n_features = X.shape
 
@@ -212,14 +205,15 @@ class RegressionStump(DecisionTreeRegressor):
             raise Exception("Tree not initialized. Perform a fit first")
 
         if self.n_features_ != n_features:
-            raise ValueError("Number of features of the model must "
-                             " match the input. Model n_features is %s and "
-                             " input n_features is %s "
-                             % (self.n_features_, n_features))
+            raise ValueError(
+                "Number of features of the model must "
+                " match the input. Model n_features is %s and "
+                " input n_features is %s " % (self.n_features_, n_features)
+            )
 
-        return (self.tree_.get('coefficient') *
-                (X[:, self.tree_.get('best_dim')] > self.tree_.get('threshold')) +
-                self.tree_.get('constant'))
+        return self.tree_.get("coefficient") * (
+            X[:, self.tree_.get("best_dim")] > self.tree_.get("threshold")
+        ) + self.tree_.get("constant")
 
     def predict_labels(self, X):
         return ((self.predict(X) >= 0.0) * 2) - 1
@@ -244,22 +238,22 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
     Y = y.flatten()
 
     if sample_weight is None:
-        sample_weight = np.ones(shape=(X.shape[0],), dtype='float') / (X.shape[0],)
+        sample_weight = np.ones(shape=(X.shape[0],), dtype="float") / (X.shape[0],)
     else:
         sample_weight /= np.sum(sample_weight)
 
     n_samples, n_dims = X.shape
-    if X.dtype in ('float', 'float32'):
-        thresholds = np.zeros((n_dims, ), dtype='float')
+    if X.dtype in ("float", "float32"):
+        thresholds = np.zeros((n_dims,), dtype="float")
     else:
-        thresholds = np.zeros((n_dims, ), dtype='int')
-    coeffs = np.zeros((n_dims, ), dtype='float')
-    constants = np.zeros((n_dims, ), dtype='float')
-    errors = np.zeros((n_dims, ), dtype='float')
+        thresholds = np.zeros((n_dims,), dtype="int")
+    coeffs = np.zeros((n_dims,), dtype="float")
+    constants = np.zeros((n_dims,), dtype="float")
+    errors = np.zeros((n_dims,), dtype="float")
 
     # Iterate over all feature dimensions and train the optimal
     # regression stump for each dimension.
-    for dim in six.moves.range(n_dims):
+    for dim in range(n_dims):
         if argsorted_X is not None:
             data_order = argsorted_X[:, dim]
         else:
@@ -286,11 +280,13 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
 
         # Calculate the weighted square error:
         # Time: 40 %
-        e = (sorted_weights * (sorted_output * sorted_output)).sum() - \
-            (2 * a * (Szw[-1] - Szw)) - \
-            (2 * b * Szw[-1]) + \
-            ((a * a) + (2 * a * b)) * (1 - Sw) + \
-            (b * b)
+        e = (
+            (sorted_weights * (sorted_output * sorted_output)).sum()
+            - (2 * a * (Szw[-1] - Szw))
+            - (2 * b * Szw[-1])
+            + ((a * a) + (2 * a * b)) * (1 - Sw)
+            + (b * b)
+        )
 
         del sorted_weights
         del sorted_output
@@ -306,14 +302,13 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
 
         # Handle floating point data different from integer data when it comes
         # to setting the threshold.
-        if X.dtype in ('float', 'float32'):
+        if X.dtype in ("float", "float32"):
             if min_ind == (n_samples - 1):
                 thresholds[dim] = X[data_order[min_ind], dim] + 0.1
             elif min_ind == 0:
                 thresholds[dim] = X[data_order[min_ind], dim] - 0.1
             else:
-                thresholds[dim] = (X[data_order[min_ind], dim] +
-                                 X[data_order[min_ind + 1], dim]) / 2
+                thresholds[dim] = (X[data_order[min_ind], dim] + X[data_order[min_ind + 1], dim]) / 2
         else:
             if min_ind == (n_samples - 1):
                 thresholds[dim] = np.floor(X[data_order[min_ind], dim]) + 1
@@ -323,7 +318,7 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
                 v1 = int(X[data_order[min_ind], dim])
                 v2 = int(X[data_order[min_ind + 1], dim])
                 thr = (v1 + v2) / 2
-                if np.abs(thr) > (2 ** 31):
+                if np.abs(thr) > (2**31):
                     print("Threshold for dimension {0} was greater than 32 bit integer!".format(dim))
                 thresholds[dim] = np.int32(thr)
 
@@ -331,11 +326,11 @@ def _fit_regressor_stump(X, y, sample_weight, argsorted_X=None):
 
     best_dim = errors.argmin()
     results = {
-        'best_dim': int(best_dim),
-        'min_value': float(errors[best_dim]),
-        'threshold': float(thresholds[best_dim]),
-        'coefficient': float(coeffs[best_dim]),
-        'constant': float(constants[best_dim]),
+        "best_dim": int(best_dim),
+        "min_value": float(errors[best_dim]),
+        "threshold": float(thresholds[best_dim]),
+        "coefficient": float(coeffs[best_dim]),
+        "constant": float(constants[best_dim]),
     }
 
     return results
@@ -345,7 +340,7 @@ def _fit_regressor_stump_threaded(X, y, sample_weight, argsorted_X=None):
     Y = y.flatten()
 
     if sample_weight is None:
-        sample_weight = np.ones(shape=(X.shape[0],), dtype='float') / (X.shape[0],)
+        sample_weight = np.ones(shape=(X.shape[0],), dtype="float") / (X.shape[0],)
     else:
         sample_weight /= np.sum(sample_weight)
 
@@ -354,11 +349,12 @@ def _fit_regressor_stump_threaded(X, y, sample_weight, argsorted_X=None):
     with cfut.ThreadPoolExecutor(max_workers=psutil.cpu_count()) as tpe:
         futures = []
         if argsorted_X is not None:
-            for dim in six.moves.range(X.shape[1]):
+            for dim in range(X.shape[1]):
                 futures.append(
-                    tpe.submit(_regressor_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim]))
+                    tpe.submit(_regressor_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim])
+                )
         else:
-            for dim in six.moves.range(X.shape[1]):
+            for dim in range(X.shape[1]):
                 futures.append(tpe.submit(_regressor_learn_one_dimension, dim, X[:, dim], Y, sample_weight))
         for future in cfut.as_completed(futures):
             classifier_result.append(future.result())
@@ -368,11 +364,11 @@ def _fit_regressor_stump_threaded(X, y, sample_weight, argsorted_X=None):
     best_result = classifier_result[0]
 
     return {
-        'best_dim': int(best_result[0]),
-        'min_value': float(best_result[1]),
-        'threshold': float(best_result[2]),
-        'coefficient': float(best_result[3]),
-        'constant': float(best_result[4]),
+        "best_dim": int(best_result[0]),
+        "min_value": float(best_result[1]),
+        "threshold": float(best_result[2]),
+        "coefficient": float(best_result[3]),
+        "constant": float(best_result[4]),
     }
 
 
@@ -396,25 +392,31 @@ def _fit_regressor_stump_c_ext(X, y, sample_weight, argsorted_X=None):
         return _fit_regressor_stump(X, y, sample_weight, argsorted_X)
 
     if sample_weight is None:
-        sample_weight = np.ones(shape=(len(y),), dtype='float') / (len(y),)
+        sample_weight = np.ones(shape=(len(y),), dtype="float") / (len(y),)
     else:
         sample_weight /= np.sum(sample_weight)
 
-    if X.dtype in ('float', 'float32'):
+    if X.dtype in ("float", "float32"):
         output = c_classifiers.train_regression_stump_double(
-            X.T, np.array(y.flatten(), dtype='float'), sample_weight,
-            argsorted_X if argsorted_X is not None else np.argsort(X.T, axis=1))
+            X.T,
+            np.array(y.flatten(), dtype="float"),
+            sample_weight,
+            argsorted_X if argsorted_X is not None else np.argsort(X.T, axis=1),
+        )
     else:
         output = c_classifiers.train_regression_stump_int32(
-            X.T, np.array(y.flatten(), dtype='float'), sample_weight,
-            argsorted_X if argsorted_X is not None else np.argsort(X.T, axis=0))
+            X.T,
+            np.array(y.flatten(), dtype="float"),
+            sample_weight,
+            argsorted_X if argsorted_X is not None else np.argsort(X.T, axis=0),
+        )
 
     return {
-        'min_value': float(output[0]),
-        'best_dim': int(output[1]),
-        'threshold': float(output[2]),
-        'coefficient': float(output[3]),
-        'constant': float(output[4]),
+        "min_value": float(output[0]),
+        "best_dim": int(output[1]),
+        "threshold": float(output[2]),
+        "coefficient": float(output[3]),
+        "constant": float(output[4]),
     }
 
 
@@ -425,7 +427,7 @@ def _fit_regressor_stump_c_ext_threaded(X, y, sample_weight, argsorted_X=None):
     Y = y.flatten()
 
     if sample_weight is None:
-        sample_weight = np.ones(shape=(X.shape[0],), dtype='float') / (X.shape[0],)
+        sample_weight = np.ones(shape=(X.shape[0],), dtype="float") / (X.shape[0],)
     else:
         sample_weight /= np.sum(sample_weight)
 
@@ -434,11 +436,12 @@ def _fit_regressor_stump_c_ext_threaded(X, y, sample_weight, argsorted_X=None):
     with cfut.ThreadPoolExecutor(max_workers=psutil.cpu_count()) as tpe:
         futures = []
         if argsorted_X is not None:
-            for dim in six.moves.range(X.shape[1]):
+            for dim in range(X.shape[1]):
                 futures.append(
-                    tpe.submit(_regressor_c_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim]))
+                    tpe.submit(_regressor_c_learn_one_dimension, dim, X[:, dim], Y, sample_weight, argsorted_X[:, dim])
+                )
         else:
-            for dim in six.moves.range(X.shape[1]):
+            for dim in range(X.shape[1]):
                 futures.append(tpe.submit(_regressor_c_learn_one_dimension, dim, X[:, dim], Y, sample_weight))
         for future in cfut.as_completed(futures):
             classifier_result.append(future.result())
@@ -448,11 +451,11 @@ def _fit_regressor_stump_c_ext_threaded(X, y, sample_weight, argsorted_X=None):
     best_result = classifier_result[0]
 
     return {
-        'best_dim': int(best_result[0]),
-        'min_value': float(best_result[1]),
-        'threshold': float(best_result[2]),
-        'coefficient': float(best_result[3]),
-        'constant': float(best_result[4]),
+        "best_dim": int(best_result[0]),
+        "min_value": float(best_result[1]),
+        "threshold": float(best_result[2]),
+        "coefficient": float(best_result[3]),
+        "constant": float(best_result[4]),
     }
 
 
@@ -482,11 +485,13 @@ def _regressor_learn_one_dimension(dim_nbr, x, y, sample_weights, sorting_argume
 
     # Calculate the weighted square error:
     # Time: 40 %
-    e = (sorted_weights * (sorted_output * sorted_output)).sum() - \
-        (2 * a * (Szw[-1] - Szw)) - \
-        (2 * b * Szw[-1]) + \
-        ((a * a) + (2 * a * b)) * (1 - Sw) + \
-        (b * b)
+    e = (
+        (sorted_weights * (sorted_output * sorted_output)).sum()
+        - (2 * a * (Szw[-1] - Szw))
+        - (2 * b * Szw[-1])
+        + ((a * a) + (2 * a * b)) * (1 - Sw)
+        + (b * b)
+    )
 
     del sorted_output
     del sorted_weights
@@ -503,14 +508,13 @@ def _regressor_learn_one_dimension(dim_nbr, x, y, sample_weights, sorting_argume
 
     # Handle floating point data different from integer data when it comes
     # to setting the threshold.
-    if x.dtype in ('float', 'float32'):
+    if x.dtype in ("float", "float32"):
         if min_ind == (n_samples - 1):
             threshold = x[sorting_argument[min_ind]] + 0.1
         elif min_ind == 0:
             threshold = x[sorting_argument[min_ind]] - 0.1
         else:
-            threshold = (x[sorting_argument[min_ind]] +
-                         x[sorting_argument[min_ind + 1]]) / 2
+            threshold = (x[sorting_argument[min_ind]] + x[sorting_argument[min_ind + 1]]) / 2
     else:
         if min_ind == (n_samples - 1):
             threshold = np.floor(x[sorting_argument[min_ind]]) + 1
@@ -520,7 +524,7 @@ def _regressor_learn_one_dimension(dim_nbr, x, y, sample_weights, sorting_argume
             v1 = int(x[sorting_argument[min_ind]])
             v2 = int(x[sorting_argument[min_ind + 1]])
             thr = (v1 + v2) / 2
-            if np.abs(thr) > (2 ** 31):
+            if np.abs(thr) > (2**31):
                 print("Threshold for dimension {0} was greater than 32 bit integer!".format(dim_nbr))
             threshold = np.int32(thr)
 
@@ -532,7 +536,12 @@ def _regressor_learn_one_dimension(dim_nbr, x, y, sample_weights, sorting_argume
 def _regressor_c_learn_one_dimension(dim_nbr, x, y, sample_weights, sorting_argument=None):
 
     output = c_classifiers.fit_regression_stump(
-        x, np.array(y, dtype='float'), sample_weights,
-        sorting_argument if sorting_argument is not None else np.argsort(x))
+        x,
+        np.array(y, dtype="float"),
+        sample_weights,
+        sorting_argument if sorting_argument is not None else np.argsort(x),
+    )
 
-    return [dim_nbr, ] + list(output)
+    return [
+        dim_nbr,
+    ] + list(output)
