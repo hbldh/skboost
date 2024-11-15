@@ -1,6 +1,6 @@
 # skboost
 
-[![Build Status](https://travis-ci.org/hbldh/skboost.svg)](https://travis-ci.org/hbldh/skboost)
+[![Build and test](https://github.com/hbldh/skboost/actions/workflows/python-package.yml/badge.svg)](https://github.com/hbldh/skboost/actions/workflows/python-package.yml)
 
 Boosting Algorithms compatible with [scikit-learn](http://scikit-learn.org/).
 
